@@ -23,5 +23,13 @@
 					Azure Automation Solution
 		Script will Create Custom Log "CSVINFOlog" used in Single Cluster node to collect CSV information 
 		Script will Create RunAsAccount for the automation account 
+		
+Onboard Windows Admin Center to Azure Monitor and Configure alerts using the below link. 
+https://docs.microsoft.com/en-us/azure-stack/hci/manage/azure-monitor#setting-up-alerts-using-windows-admin-center 
+
+
+![Image1](https://user-images.githubusercontent.com/40923112/123639219-426e2580-d820-11eb-969c-4486a4011a34.png)
+![Image2](https://user-images.githubusercontent.com/40923112/123639342-5fa2f400-d820-11eb-9b41-8bd11dec8c5a.png)
 
     
+
