@@ -1,0 +1,297 @@
+[
+
+    {
+      "Name": "Cluster CSV File System IO Read Bytes",
+	  "ObjectName": "Cluster CSV File System",
+      "CounterName": "IO Read Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Cluster CSV File System IO Latency",
+      "ObjectName": "Cluster CSV File System",
+      "CounterName": "IO Read Latency",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Cluster CSV File System IO Reads sec",
+      "ObjectName": "Cluster CSV File System",
+      "CounterName": "IO Reads/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+      "Name": "Cluster CSV File System IO Write Bytes sec",
+	  "ObjectName": "Cluster CSV File System",
+      "CounterName": "IO Write Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Cluster CSV File System IO Write Latency",
+      "ObjectName": "Cluster CSV File System",
+      "CounterName": "IO Write Latency",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+      "Name": "Cluster CSV File System IO Write sec",
+	  "ObjectName": "Cluster CSV File System",
+      "CounterName": "IO Writes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+   {
+	"Name": "Cluster CSV File System Redirected Write",
+      "ObjectName": "Cluster CSV File System",
+      "CounterName": "Redirected Write",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+   {
+	  "Name": "Cluster CSV File System Redirected Read",
+      "ObjectName": "Cluster CSV File System",
+      "CounterName": "Redirected Read",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Hyper-V Dynamic Memory VM Guest Visible Physical Memory",
+      "ObjectName": "Hyper-V Dynamic Memory VM",
+      "CounterName": "Guest Visible Physical Memory",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "Hyper-V Dynamic Memory VM Physical Memory",
+      "ObjectName": "Hyper-V Dynamic Memory VM",
+      "CounterName": "Physical Memory",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+	{
+	  "Name": "Hyper-V Dynamic Memory VM Average Pressure",
+      "ObjectName": "Hyper-V Dynamic Memory VM",
+      "CounterName": "Average Pressure",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+	{
+	  "Name": "Hyper-V Dynamic Memory VM Current  Pressure",
+      "ObjectName": "Hyper-V Dynamic Memory VM",
+      "CounterName": "Current Pressure",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "Hyper-V Hypervisor Logical Processor Total Run Time",
+      "ObjectName": "Hyper-V Hypervisor Logical Processor",
+      "CounterName": "% Total Run Time",
+      "InstanceName": "_Total",
+      "intervalSeconds": 60
+    },
+    {
+	  "Name": "Hyper-V Hypervisor Virtual Processor Total Run Time",
+      "ObjectName": "Hyper-V Hypervisor Virtual Processor",
+      "CounterName": "% Total Run Time",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Hyper-V Virtual Storage Device Read Bytes sec",
+      "ObjectName": "Hyper-V Virtual Storage Device",
+      "CounterName": "Read Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Hyper-V Virtual Storage Device Read Operations Sec",
+      "ObjectName": "Hyper-V Virtual Storage Device",
+      "CounterName": "Read Operations/Sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Hyper-V Virtual Storage Device Write Bytes sec",
+      "ObjectName": "Hyper-V Virtual Storage Device",
+      "CounterName": "Write Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Hyper-V Virtual Storage Device Write Operations Sec",
+      "ObjectName": "Hyper-V Virtual Storage Device",
+      "CounterName": "Write Operations/Sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+	{
+	  "Name": "Hyper-V Hypervisor Root Virtual Processor",
+      "ObjectName": "Hyper-V Hypervisor Root Virtual Processor",
+      "CounterName": "% Total Run Time",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Free Space",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "% Free Space",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Avg Disk sec Read",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Avg. Disk sec/Read",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Avg Disk sec Transfer",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Avg. Disk sec/Transfer",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Avg Disk sec Write",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Avg. Disk sec/Write",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Current Disk Queue Length",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Current Disk Queue Length",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Current Disk Bytes sec",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Disk Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Disk Read Bytes sec",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Disk Read Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Disk Read sec",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Disk Reads/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Disk Transfer sec",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Disk Transfers/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Disk Write Bytes sec",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Disk Write Bytes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Disk Writes sec",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Disk Writes/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "LogicalDisk Free Megabytes",
+      "ObjectName": "LogicalDisk",
+      "CounterName": "Free Megabytes",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+      "Name": "Memory Committed Bytes In Use",
+	  "ObjectName": "Memory",
+      "CounterName": "% Committed Bytes In Use",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+    {
+      "Name": "Memory Available MBytes",
+	  "ObjectName": "Memory",
+      "CounterName": "Available MBytes",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "Memory Commit Limit",
+      "ObjectName": "Memory",
+      "CounterName": "Commit Limit",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "Memory Committed Bytes",
+      "ObjectName": "Memory",
+      "CounterName": "Committed Bytes",
+      "InstanceName": "*",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "Network Adapter Bytes Received sec",
+      "ObjectName": "Network Adapter",
+      "CounterName": "Bytes Received/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Network Adapter Bytes Sent sec",
+      "ObjectName": "Network Adapter",
+      "CounterName": "Bytes Sent/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Network Interface Bytes Total sec",
+      "ObjectName": "Network Interface",
+      "CounterName": "Bytes Total/sec",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "NUMA Node Memory Available MBytes",
+      "ObjectName": "NUMA Node Memory",
+      "CounterName": "Available MBytes",
+      "InstanceName": "_Total",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "NUMA Node Memory Total MBytes",
+      "ObjectName": "NUMA Node Memory",
+      "CounterName": "Total MBytes",
+      "InstanceName": "_Total",
+      "intervalSeconds": 1800
+    },
+    {
+	  "Name": "Processor Processor Time",
+      "ObjectName": "Processor",
+      "CounterName": "% Processor Time",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    },
+    {
+	  "Name": "Systeml Processor Queue Length",
+      "ObjectName": "System",
+      "CounterName": "Processor Queue Length",
+      "InstanceName": "*",
+      "intervalSeconds": 300
+    }
+  ]
