@@ -76,6 +76,41 @@ $CSVINFO = @"
         ]
     }
 "@
+$CLUINFO = @"
+{
+    "customLogName": "clustername_CL",
+    "description": "Example custom log datasource",
+    "inputs": [
+        {
+            "location": {
+            "fileSystemLocations": {
+                "windowsFileTypeLogPaths": [ "C:\\CSVToLAlogs\\Clusterinfo_*.log" ],
+                }
+            },
+        "recordDelimiter": {
+            "regexDelimiter": {
+                "pattern": "\\n",
+                "matchIndex": 0,
+                "matchIndexSpecified": true,
+                "numberedGroup": null
+                }
+            }
+        }
+    ],
+    "extractions": [
+        {
+            "extractionName": "TimeGenerated",
+            "extractionType": "DateTime",
+            "extractionProperties": {
+                "dateTimeExtraction": {
+                    "regex": null,
+                    "joinStringRegex": null
+                    }
+                }
+            }
+        ]
+    }
+"@
 
 
 if (!($AZAutomationAccount -eq $null ) )
