@@ -4,7 +4,7 @@
     {
       "type": 9,
       "content": {
-        "version": "KqlParameterItem/3.0",
+        "version": "KqlParameterItem/1.0",
         "parameters": [
           {
             "id": "162fbe40-d785-4e3f-a70c-bc4411c9572b",
@@ -13,8 +13,7 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 4924800000,
-              "endTime": "2021-06-27T06:53:00.000Z"
+              "durationMs": 43200000
             },
             "typeSettings": {
               "selectableValues": [
@@ -67,44 +66,43 @@
             }
           },
           {
-            "id": "a7e3efb5-3af7-4dac-b243-48564c14d904",
+            "id": "02d735fd-dd65-46d4-9b4b-baeae4dfc7a2",
             "version": "KqlParameterItem/1.0",
             "name": "Cluster",
             "type": 2,
-            "query": "resources\r\n| where type == 'microsoft.azurestackhci/clusters'\r\n| extend reportedProperties = properties.reportedProperties\r\n| extend clusterName = reportedProperties.clusterName\r\n| extend  tostring(clusterName)\r\n| project clusterName\r\n\r\n\r\n",
-            "value": "AzStackCluster",
+            "isRequired": true,
+            "query": "\r\nclustername_CL\r\n| where TimeGenerated > now(-100day)\r\n| parse RawData with * \"CN=\" ClusterName \"Node=\" NodeName\r\n| distinct ClusterName",
+            "value": null,
             "typeSettings": {
-              "additionalResourceOptions": [],
-              "showDefault": false
+              "additionalResourceOptions": []
             },
-            "queryType": 1,
-            "resourceType": "microsoft.resourcegraph/resources"
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
           },
           {
-            "id": "e9126970-4359-473c-b537-9b2b17200ce8",
+            "id": "8e672e08-cee6-4106-a1c3-fb20ca75a091",
             "version": "KqlParameterItem/1.0",
             "name": "Clusternodes",
             "type": 2,
+            "isRequired": true,
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "resources\r\n| where type == 'microsoft.azurestackhci/clusters'\r\n| where (name == '{Cluster}')\r\n| extend reportedProperties = properties.reportedProperties\r\n| mv-expand nodes = reportedProperties.nodes\r\n| project node_name = nodes.name\r\n",
-            "value": [
-              "value::all"
-            ],
+            "query": "clustername_CL\r\n| where TimeGenerated > now(-100day)\r\n| parse RawData with * \"CN=\" ClusterName \"Node=\" NodeName\r\n| extend NodeName = trim(@\"[^\\w]+\",tostring(NodeName))   \r\n| distinct  NodeName\r\n\r\n",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
               ],
               "showDefault": false
             },
-            "queryType": 1,
-            "resourceType": "microsoft.resourcegraph/resources"
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
           }
         ],
         "style": "pills",
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources"
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
       },
       "conditionalVisibility": {
         "parameterName": "SelectedTab",
@@ -194,6 +192,38 @@
         "version": "KqlParameterItem/1.0",
         "parameters": [
           {
+            "id": "85cf99ee-3406-4cdd-a629-49388a8161a5",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscriptions",
+            "type": 6,
+            "value": null,
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "includeAll": true
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
+            "id": "c04adf4c-bed1-49b2-b330-3b84631f19ee",
+            "version": "KqlParameterItem/1.0",
+            "name": "DefaultWorkspace",
+            "type": 5,
+            "isRequired": true,
+            "value": null,
+            "isHiddenWhenLocked": true,
+            "typeSettings": {
+              "resourceTypeFilter": {
+                "microsoft.operationalinsights/workspaces": true
+              },
+              "additionalResourceOptions": []
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
             "id": "93cdc518-8617-45d9-a38b-b220e1cbb0da",
             "version": "KqlParameterItem/1.0",
             "name": "ContextSelection",
@@ -250,8 +280,7 @@
             "quote": "'",
             "delimiter": ",",
             "value": [
-              "/subscriptions/97e85eba-485a-4100-aca9-eb480f45dea0/resourcegroups/hci-rg/providers/Microsoft.OperationalInsights/workspaces/hci-la",
-              "/subscriptions/97e85eba-485a-4100-aca9-eb480f45dea0/resourceGroups/hci-rg/providers/Microsoft.OperationalInsights/workspaces/hci-la"
+              "/subscriptions/97e85eba-485a-4100-aca9-eb480f45dea0/resourcegroups/hci-rg/providers/Microsoft.OperationalInsights/workspaces/hci-la"
             ],
             "typeSettings": {
               "resourceTypeFilter": {
@@ -272,7 +301,7 @@
             "name": "TimeGrain",
             "type": 2,
             "isRequired": true,
-            "value": "1h",
+            "value": "30m",
             "typeSettings": {
               "additionalResourceOptions": []
             },
@@ -1364,7 +1393,7 @@
             "label": "Select Cluster",
             "type": 2,
             "isRequired": true,
-            "query": "info_CL\r\n| where TimeGenerated > now(-100day)\r\n| parse RawData with * \"CN=\" ClusterName \"Node=\" NodeName\r\n| distinct ClusterName",
+            "query": "csvinfo_CL \r\n| parse RawData with * \"CN=\" ClusterName \"CVN=\" CSVName \"TS=\" totalSize:long * \"FS=\" FreeSpace:long * \"US=\" UsedSpace:long * \"UP=\" FreePerct\r\n| distinct ClusterName",
             "value": null,
             "typeSettings": {
               "additionalResourceOptions": [],
@@ -1496,7 +1525,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let csvread = Perf\r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Cluster CSV File System\" and CounterName == \"IO Read Latency\" and  InstanceName != \"_Total\"\r\n| extend VMName = InstanceName\r\n| summarize IO_Read_Latency = toint(avg(CounterValue))  by InstanceName ,Computer;\r\n\r\nlet csvwrite = Perf\r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Cluster CSV File System\" and CounterName == \"IO Write Latency\" and  InstanceName != \"_Total\"\r\n| summarize IO_Write_Latency = toint(avg(CounterValue))  by InstanceName ,Computer;\r\n\r\ncsvread \r\n|join kind= inner csvwrite on InstanceName\r\n|project Computer , InstanceName ,IO_Write_Latency ,IO_Read_Latency  \r\n",
+        "query": "let csvread = Perf\r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Cluster CSV File System\" and CounterName == \"IO Read Latency\" and  InstanceName != \"_Total\"\r\n| extend VMName = InstanceName\r\n| summarize IO_Read_Latency = toint(avg(CounterValue))  by InstanceName ,Computer;\r\n\r\nlet csvwrite = Perf\r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Cluster CSV File System\" and CounterName == \"IO Write Latency\" and  InstanceName != \"_Total\"\r\n| summarize IO_Write_Latency = toint(avg(CounterValue))  by InstanceName ,Computer;\r\n\r\ncsvread \r\n|join kind= inner csvwrite on InstanceName\r\n|project Computer , InstanceName ,IO_Write_Latency ,IO_Read_Latency  \r\n",
         "size": 0,
         "title": "Cluster CSV File System",
         "noDataMessage": "There is No data returned in time Range You Picked , Please Check Custom Logs Status",
@@ -1618,7 +1647,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "Event \r\n| where Computer has_any ({Clusternodes})and TimeGenerated {TimeRangeParm}\r\n| distinct EventLevelName",
+            "query": "Event \r\n| where Computer in ({Clusternodes})and TimeGenerated {TimeRangeParm}\r\n| distinct EventLevelName",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -1638,7 +1667,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "Event \r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where EventLevelName in ({EventLevelParam}) | distinct EventLog",
+            "query": "Event \r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where EventLevelName in ({EventLevelParam}) | distinct EventLog",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -1658,7 +1687,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "Event \r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where EventLevelName in ({EventLevelParam}) and EventLog in ({EventLogParam})\r\n| distinct Source",
+            "query": "Event \r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where EventLevelName in ({EventLevelParam}) and EventLog in ({EventLogParam})\r\n| distinct Source",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -1678,7 +1707,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "Event \r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where EventLevelName in ({EventLevelParam}) and Source in ({SourceParam})\r\n| distinct EventID",
+            "query": "Event \r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where EventLevelName in ({EventLevelParam}) and Source in ({SourceParam})\r\n| distinct EventID",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -1705,7 +1734,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Event \r\n//| where Computer in ({Clusternodes}) and EventLevelName in ({EventLevelParam}) and TimeGenerated {TimeRangeParm}\r\n|where Computer has_any ({Clusternodes})  and EventLevelName in ({EventLevelParam}) and EventLog in ({EventLogParam}) and Source in ({SourceParam}) and EventID in ({EventIDParam}) and TimeGenerated {TimeRangeParm}\r\n| project Computer, EventLevelName\r\n| evaluate pivot(EventLevelName)\r\n",
+        "query": "Event \r\n//| where Computer in ({Clusternodes}) and EventLevelName in ({EventLevelParam}) and TimeGenerated {TimeRangeParm}\r\n|where Computer in ({Clusternodes})  and EventLevelName in ({EventLevelParam}) and EventLog in ({EventLogParam}) and Source in ({SourceParam}) and EventID in ({EventIDParam}) and TimeGenerated {TimeRangeParm}\r\n| project Computer, EventLevelName\r\n| evaluate pivot(EventLevelName)\r\n",
         "size": 1,
         "title": "Event Summary ",
         "exportFieldName": "Computer",
@@ -1756,7 +1785,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Event \r\n| where Computer has_any ({Clusternodes}) and EventLevelName == 'Error' and EventLog == \"System\" and Source == 'Microsoft-Windows-WER-SystemErrorReporting' and EventID == '1001'   and TimeGenerated {TimeRangeParm}\r\n| parse kind=relaxed EventData with * \"<Data Name=\\\"param1\\\">\" BugcheckCode \"</Data>\" \"<Data Name=\\\"param2\\\">\" MemoryDump \"</Data>\" *\r\n| project TimeGenerated ,Computer, BugcheckCode , MemoryDump\r\n//| evaluate pivot(EventLevelName)",
+        "query": "Event \r\n| where Computer in ({Clusternodes}) and EventLevelName == 'Error' and EventLog == \"System\" and Source == 'Microsoft-Windows-WER-SystemErrorReporting' and EventID == '1001'   and TimeGenerated {TimeRangeParm}\r\n| parse kind=relaxed EventData with * \"<Data Name=\\\"param1\\\">\" BugcheckCode \"</Data>\" \"<Data Name=\\\"param2\\\">\" MemoryDump \"</Data>\" *\r\n| project TimeGenerated ,Computer, BugcheckCode , MemoryDump\r\n//| evaluate pivot(EventLevelName)",
         "size": 4,
         "title": "Recent Crashed Event for \"{ComputersParam}\" With BugCheckCode",
         "noDataMessage": "There are No Recent OS Crashs ",
@@ -3860,7 +3889,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Event\r\n| where Computer has_any ({Clusternodes}) and Source == 'Service Control Manager' and EventID == '7031' and TimeGenerated {TimeRangeParm}\r\n| parse kind=relaxed EventData with * \"<Data Name=\\\"param1\\\">\" ServiceName \"</Data>\" \"<Data Name=\\\"param2\\\">\"  TerminatedCount \"</Data>\" \"<Data Name=\\\"param3\\\">\" MS \"</Data>\" \"<Data Name=\\\"param4\\\">\" param4 \"</Data>\"\"<Data Name=\\\"param5\\\">\" CorrectiveAction \"</Data>\" *\r\n| sort by ServiceName desc\r\n| project Computer,ServiceName,TerminatedCount,CorrectiveAction",
+        "query": "Event\r\n| where Computer in ({Clusternodes}) and Source == 'Service Control Manager' and EventID == '7031' and TimeGenerated {TimeRangeParm}\r\n| parse kind=relaxed EventData with * \"<Data Name=\\\"param1\\\">\" ServiceName \"</Data>\" \"<Data Name=\\\"param2\\\">\"  TerminatedCount \"</Data>\" \"<Data Name=\\\"param3\\\">\" MS \"</Data>\" \"<Data Name=\\\"param4\\\">\" param4 \"</Data>\"\"<Data Name=\\\"param5\\\">\" CorrectiveAction \"</Data>\" *\r\n| sort by ServiceName desc\r\n| project Computer,ServiceName,TerminatedCount,CorrectiveAction",
         "size": 4,
         "title": "Results For \"{ComputersParam}\"",
         "noDataMessage": "Event ID \"7031\" Was Not Found ",
@@ -3942,7 +3971,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Event\r\n| where Source in ({SourceParam}) \r\n| where EventLog in ({EventLogParam}) \r\n| where EventLevelName in ({EventLevelParam}) \r\n| where Computer has_any ({Clusternodes}) \r\n| summarize EventCount=count(EventLevel) by Source, EventLog, Computer\r\n| extend jkey = 1\r\n| join (Event \r\n        | where Source in ({SourceParam}) \r\n        | where EventLog in ({EventLogParam}) \r\n        | where EventLevelName in ({EventLevelParam}) \r\n        | where Computer has_any ({Clusternodes}) \r\n        | make-series EventTimeLine = count(EventLevel) default = 0 on TimeGenerated from {TimeRangeParm:start} to {TimeRangeParm:end} step {TimeRangeParm:grain} by Source, EventLog) on Source\r\n| project-away jkey, Source1, EventLog1, TimeGenerated",
+        "query": "Event\r\n| where Source in ({SourceParam}) \r\n| where EventLog in ({EventLogParam}) \r\n| where EventLevelName in ({EventLevelParam}) \r\n| where Computer in ({Clusternodes}) \r\n| summarize EventCount=count(EventLevel) by Source, EventLog, Computer\r\n| extend jkey = 1\r\n| join (Event \r\n        | where Source in ({SourceParam}) \r\n        | where EventLog in ({EventLogParam}) \r\n        | where EventLevelName in ({EventLevelParam}) \r\n        | where Computer in ({Clusternodes}) \r\n        | make-series EventTimeLine = count(EventLevel) default = 0 on TimeGenerated from {TimeRangeParm:start} to {TimeRangeParm:end} step {TimeRangeParm:grain} by Source, EventLog) on Source\r\n| project-away jkey, Source1, EventLog1, TimeGenerated",
         "size": 0,
         "showAnalytics": true,
         "title": "Event List",
@@ -3980,7 +4009,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Event\r\n| where Source in ({SourceParam}) \r\n| where EventLog in ({EventLogParam}) \r\n| where EventLevelName in ({EventLevelParam})\r\n| where Computer has_any ({Clusternodes}) \r\n| extend Pack=pack_all()\r\n| extend TimeFromNow = now() - TimeGenerated\r\n| extend TimeAgo = strcat(case(TimeFromNow < 2m, strcat(toint(TimeFromNow / 1m), ' seconds'), TimeFromNow < 2h, strcat(toint(TimeFromNow / 1m), ' minutes'), TimeFromNow < 2d, strcat(toint(TimeFromNow / 1h), ' hours'), strcat(toint(TimeFromNow / 1d), ' days')), ' ago') \r\n| project [\"Time\"]=strcat('🕒', TimeAgo), EventLog, Computer, RenderedDescription, UserName, [\"Details\"]=Pack\r\n",
+        "query": "Event\r\n| where Source in ({SourceParam}) \r\n| where EventLog in ({EventLogParam}) \r\n| where EventLevelName in ({EventLevelParam})\r\n| where Computer in ({Clusternodes}) \r\n| extend Pack=pack_all()\r\n| extend TimeFromNow = now() - TimeGenerated\r\n| extend TimeAgo = strcat(case(TimeFromNow < 2m, strcat(toint(TimeFromNow / 1m), ' seconds'), TimeFromNow < 2h, strcat(toint(TimeFromNow / 1m), ' minutes'), TimeFromNow < 2d, strcat(toint(TimeFromNow / 1h), ' hours'), strcat(toint(TimeFromNow / 1d), ' days')), ' ago') \r\n| project [\"Time\"]=strcat('🕒', TimeAgo), EventLog, Computer, RenderedDescription, UserName, [\"Details\"]=Pack\r\n",
         "size": 0,
         "showAnalytics": true,
         "title": "Event List",
@@ -4013,16 +4042,9 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let WindowsServers = Heartbeat\r\n| where OSType == \"Windows\"  and Computer has_any ({Clusternodes}) \r\n| distinct Computer;\r\nlet CPU = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Processor\" and CounterName == '% Processor Time' and InstanceName == \"_Total\"\r\n| summarize avgCPU = toint(avg(CounterValue)), maxCPU = toint(max(CounterValue)) by Computer;\r\nlet Memory = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where CounterName == \"% Committed Bytes In Use\" \r\n| summarize avgMemory = toint(avg(CounterValue)) by Computer;\r\nlet AvailableMBytes = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Memory\" and  CounterName == \"Available MBytes\"\r\n| summarize MemAvailableMBytes = (max(CounterValue))  by Computer;\r\nlet DiscoC = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\" and InstanceName =~ \"C:\"\r\n| summarize avgDriveC = toint(max(CounterValue))  by Computer;\r\nlet HypervisorLP = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Hyper-V Hypervisor Logical Processor\" and CounterName == \"% Total Run Time\" and InstanceName == \"_Total\" \r\n| summarize AvgHypervisorLP = toint(max(CounterValue)) by Computer;\r\nlet HypervisorRT = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Hyper-V Hypervisor Root Virtual Processor\" and CounterName == \"% Total Run Time\" and InstanceName == \"_Total\" \r\n| summarize AvgHypervisorRT = toint(avg(CounterValue)) by Computer;\r\n\r\n\r\nCPU \r\n| join kind= inner Memory on Computer \r\n| join kind= inner DiscoC on Computer \r\n| join kind= inner HypervisorLP on Computer\r\n| join kind= inner HypervisorRT on Computer \r\n| join kind= inner AvailableMBytes on Computer \r\n\r\n| project Computer, avgCPU ,maxCPU , avgMemory ,MemAvailableMBytes, avgDriveC ,AvgHypervisorLP  ,AvgHypervisorRT\r\n| order by avgCPU desc\r\n",
+        "query": "let WindowsServers = Heartbeat\r\n| where OSType == \"Windows\"  and Computer in ({Clusternodes}) \r\n| distinct Computer;\r\nlet CPU = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Processor\" and CounterName == '% Processor Time' and InstanceName == \"_Total\"\r\n| summarize avgCPU = toint(avg(CounterValue)), maxCPU = toint(max(CounterValue)) by Computer;\r\nlet Memory = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where CounterName == \"% Committed Bytes In Use\" \r\n| summarize avgMemory = toint(avg(CounterValue)) by Computer;\r\nlet AvailableMBytes = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Memory\" and  CounterName == \"Available MBytes\"\r\n| summarize MemAvailableMBytes = (max(CounterValue))  by Computer;\r\nlet DiscoC = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\" and InstanceName =~ \"C:\"\r\n| summarize avgDriveC = toint(max(CounterValue))  by Computer;\r\nlet HypervisorLP = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Hyper-V Hypervisor Logical Processor\" and CounterName == \"% Total Run Time\" and InstanceName == \"_Total\" \r\n| summarize AvgHypervisorLP = toint(max(CounterValue)) by Computer;\r\nlet HypervisorRT = Perf\r\n| where Computer in (WindowsServers) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Hyper-V Hypervisor Root Virtual Processor\" and CounterName == \"% Total Run Time\" and InstanceName == \"_Total\" \r\n| summarize AvgHypervisorRT = toint(avg(CounterValue)) by Computer;\r\n\r\n\r\nCPU \r\n| join kind= inner Memory on Computer \r\n| join kind= inner DiscoC on Computer \r\n| join kind= inner HypervisorLP on Computer\r\n| join kind= inner HypervisorRT on Computer \r\n| join kind= inner AvailableMBytes on Computer \r\n\r\n| project Computer, avgCPU ,maxCPU , avgMemory ,MemAvailableMBytes, avgDriveC ,AvgHypervisorLP  ,AvgHypervisorRT\r\n| order by avgCPU desc\r\n",
         "size": 0,
         "title": "Hyper-V Host Summary Overview ",
-        "exportedParameters": [
-          {
-            "fieldName": "ComputerName",
-            "parameterName": "ComputerName",
-            "parameterType": 5
-          }
-        ],
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "visualization": "table",
@@ -4286,7 +4308,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let memp = Perf\r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Hyper-V Dynamic Memory VM\" and CounterName == \"Current Pressure\"\r\n| extend VMName = InstanceName\r\n| summarize Memory_Pressure = toint(avg(CounterValue))  by VMName ,Computer;\r\n\r\nlet CPU = Perf\r\n| where ObjectName contains \"Hyper-V Hypervisor Virtual Processor\" and CounterName == \"% Total Run Time\" and InstanceName != \"_Total\"\r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| extend VMName = extract(\"(.+?):.*\",1,InstanceName)\r\n|summarize Max_VP = argmax(CounterValue, *) by  VMName ,Computer;\r\n\r\nlet CPUCores = Perf\r\n| where ObjectName contains \"Hyper-V Hypervisor Virtual Processor\" and CounterName == \"% Total Run Time\" and InstanceName != \"_Total\"\r\n| where Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| extend VMName = extract(\"(.+?):.*\",1,InstanceName)\r\n| summarize Cores = dcount(InstanceName) by VMName ,Computer;\r\n\r\nCPU \r\n|join kind= inner memp on VMName\r\n|join kind= inner CPUCores on VMName\r\n|project  VMName,Memory_Pressure,Cores,Max_VP,Computer\r\n\r\n\r\n//old query without CPU \r\n//Perf\r\n//| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n//| where ObjectName == \"Hyper-V Dynamic Memory VM\" and CounterName == \"Current Pressure\"\r\n//| summarize VMMEMPressure = toint(avg(CounterValue))  by InstanceName ,Computer;\r\n",
+        "query": "let memp = Perf\r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| where ObjectName == \"Hyper-V Dynamic Memory VM\" and CounterName == \"Current Pressure\"\r\n| extend VMName = InstanceName\r\n| summarize Memory_Pressure = toint(avg(CounterValue))  by VMName ,Computer;\r\n\r\nlet CPU = Perf\r\n| where ObjectName contains \"Hyper-V Hypervisor Virtual Processor\" and CounterName == \"% Total Run Time\" and InstanceName != \"_Total\"\r\n| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| extend VMName = extract(\"(.+?):.*\",1,InstanceName)\r\n|summarize Max_VP = argmax(CounterValue, *) by  VMName ,Computer;\r\n\r\nCPU \r\n|join kind= inner memp on VMName\r\n|project  VMName ,Memory_Pressure ,Max_VP , Computer\r\n\r\n\r\n//old query without CPU \r\n//Perf\r\n//| where Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n//| where ObjectName == \"Hyper-V Dynamic Memory VM\" and CounterName == \"Current Pressure\"\r\n//| summarize VMMEMPressure = toint(avg(CounterValue))  by InstanceName ,Computer;\r\n",
         "size": 0,
         "title": "Virtual Machines Summary {Cluster}",
         "queryType": 0,
@@ -4372,7 +4394,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "//Check https://docs.microsoft.com/en-us/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained \r\nlet _minValuePerc = 100; \r\nlet _minValue =  0;\r\nlet FreeMB = Perf\r\n| where CounterValue <= _minValue or _minValue == 0\r\n| where TimeGenerated > now(-10min) and CounterName == \"Free Megabytes\"  and Computer has_any ({Clusternodes})\r\n//| summarize FreeMB = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| summarize FreeMB = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//FreeMB\r\nlet FreeSpace = Perf\r\n| where CounterValue <= _minValuePerc\r\n| where TimeGenerated > now(-10min) and CounterName == \"% Free Space\" and InstanceName contains \":\"  and Computer has_any ({Clusternodes}) //and TimeGenerated {TimeRangeParm}\r\n| summarize FreeSpace = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//Add Avg. Disk sec/Read\r\nlet readsec = Perf\r\n| where TimeGenerated > now(-10min) and ObjectName == \"LogicalDisk\" and  CounterName == \"Avg. Disk sec/Read\" and InstanceName contains \":\" and Computer has_any ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| summarize readsec = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//Add Avg. Disk sec/Write \r\nlet Wrirtesec = Perf\r\n| where TimeGenerated > now(-10min) and ObjectName == \"LogicalDisk\" and  CounterName == \"Avg. Disk sec/Write\" and InstanceName contains \":\" and Computer has_any ({Clusternodes}) //and TimeGenerated {TimeRangeParm}\r\n| summarize Wrirtesec = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//Add Disk Transfers/sec \r\nlet Transferssec = Perf\r\n| where TimeGenerated > now(-10min) and ObjectName == \"LogicalDisk\" and  CounterName == \"Disk Transfers/sec\" and InstanceName contains \":\" and Computer has_any ({Clusternodes}) //and TimeGenerated {TimeRangeParm}\r\n| summarize Transferssec = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n\r\n//FreeSpace\r\nlet DiskTotalFreeMB = FreeMB | join FreeSpace on Computer, InstanceName | join readsec on Computer, InstanceName| join Wrirtesec on Computer, InstanceName | join Transferssec on Computer, InstanceName\r\n| project TimeGenerated, Computer, InstanceName, FreeMB, FreeSpace , readsec ,Wrirtesec ,Transferssec\r\n| extend TotalSizeGB = toint((FreeMB / FreeSpace * 100) / 1024)\r\n| extend AvgDiskRsec = (readsec * 1000)\r\n| extend AvgDiskWsec = (Wrirtesec * 1000);\r\n\r\n\r\n//DiskTotalFreeMB\r\nDiskTotalFreeMB |  sort by TimeGenerated, Computer, InstanceName\r\n| extend FreeGB = FreeMB / 1024\r\n| project Computer, InstanceName,  round(FreeGB), TotalSizeGB, round(FreeSpace) , toint(AvgDiskRsec), toint(AvgDiskWsec) ,toint(Transferssec)\r\n| distinct Computer, InstanceName, round(FreeGB), TotalSizeGB, round(FreeSpace) , toint(AvgDiskRsec), toint(AvgDiskWsec) ,toint(Transferssec)\r\n| order by round(FreeSpace) asc",
+        "query": "//Check https://docs.microsoft.com/en-us/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained \r\nlet _minValuePerc = 100; \r\nlet _minValue =  0;\r\nlet FreeMB = Perf\r\n| where CounterValue <= _minValue or _minValue == 0\r\n| where TimeGenerated > now(-10min) and CounterName == \"Free Megabytes\"  and Computer in ({Clusternodes})\r\n//| summarize FreeMB = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| summarize FreeMB = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//FreeMB\r\nlet FreeSpace = Perf\r\n| where CounterValue <= _minValuePerc\r\n| where TimeGenerated > now(-10min) and CounterName == \"% Free Space\" and InstanceName contains \":\"  and Computer in ({Clusternodes}) //and TimeGenerated {TimeRangeParm}\r\n| summarize FreeSpace = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//Add Avg. Disk sec/Read\r\nlet readsec = Perf\r\n| where TimeGenerated > now(-10min) and ObjectName == \"LogicalDisk\" and  CounterName == \"Avg. Disk sec/Read\" and InstanceName contains \":\" and Computer in ({Clusternodes}) and TimeGenerated {TimeRangeParm}\r\n| summarize readsec = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//Add Avg. Disk sec/Write \r\nlet Wrirtesec = Perf\r\n| where TimeGenerated > now(-10min) and ObjectName == \"LogicalDisk\" and  CounterName == \"Avg. Disk sec/Write\" and InstanceName contains \":\" and Computer in ({Clusternodes}) //and TimeGenerated {TimeRangeParm}\r\n| summarize Wrirtesec = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n//Add Disk Transfers/sec \r\nlet Transferssec = Perf\r\n| where TimeGenerated > now(-10min) and ObjectName == \"LogicalDisk\" and  CounterName == \"Disk Transfers/sec\" and InstanceName contains \":\" and Computer in ({Clusternodes}) //and TimeGenerated {TimeRangeParm}\r\n| summarize Transferssec = (avg(CounterValue)) by bin(TimeGenerated, 1h), Computer, InstanceName\r\n| sort by TimeGenerated, Computer desc;\r\n\r\n//FreeSpace\r\nlet DiskTotalFreeMB = FreeMB | join FreeSpace on Computer, InstanceName | join readsec on Computer, InstanceName| join Wrirtesec on Computer, InstanceName | join Transferssec on Computer, InstanceName\r\n| project TimeGenerated, Computer, InstanceName, FreeMB, FreeSpace , readsec ,Wrirtesec ,Transferssec\r\n| extend TotalSizeGB = toint((FreeMB / FreeSpace * 100) / 1024)\r\n| extend AvgDiskRsec = (readsec * 1000)\r\n| extend AvgDiskWsec = (Wrirtesec * 1000);\r\n\r\n\r\n//DiskTotalFreeMB\r\nDiskTotalFreeMB |  sort by TimeGenerated, Computer, InstanceName\r\n| extend FreeGB = FreeMB / 1024\r\n| project Computer, InstanceName,  round(FreeGB), TotalSizeGB, round(FreeSpace) , toint(AvgDiskRsec), toint(AvgDiskWsec) ,toint(Transferssec)\r\n| distinct Computer, InstanceName, round(FreeGB), TotalSizeGB, round(FreeSpace) , toint(AvgDiskRsec), toint(AvgDiskWsec) ,toint(Transferssec)\r\n| order by round(FreeSpace) asc",
         "size": 2,
         "title": "Summarize disk usage and IOPS ",
         "noDataMessage": "There is no Data Returned in The Past Hour ",
@@ -4425,7 +4447,7 @@
           "filter": true,
           "sortBy": [
             {
-              "itemKey": "$gen_bar_FreeGB_2",
+              "itemKey": "$gen_bar_FreeSpace_4",
               "sortOrder": 2
             }
           ],
@@ -4453,7 +4475,7 @@
         },
         "sortBy": [
           {
-            "itemKey": "$gen_bar_FreeGB_2",
+            "itemKey": "$gen_bar_FreeSpace_4",
             "sortOrder": 2
           }
         ]
@@ -4472,7 +4494,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Perf \r\n| where  Computer has_any ({Clusternodes}) \r\n| where CounterName == \"Disk Transfers/sec\" and TimeGenerated {TimeRangeParm}\r\n| summarize AggregatedValue = percentile(CounterValue, 95) by Computer\t\r\n",
+        "query": "Perf \r\n| where  Computer in ({Clusternodes}) \r\n| where CounterName == \"Disk Transfers/sec\" and TimeGenerated {TimeRangeParm}\r\n| summarize AggregatedValue = percentile(CounterValue, 95) by Computer\t\r\n",
         "size": 0,
         "title": "Total Disk IOPS (Transfers/Sec)",
         "queryType": 0,
@@ -4568,11 +4590,16 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": " or Classification == ",
-            "query": "Update\r\n|where TimeGenerated>ago(14h)\r\n|where  Computer has_any ({Clusternodes}) \r\n|distinct Classification ",
+            "query": "Update\r\n|where TimeGenerated>ago(14h)\r\n|where  Computer in ({Clusternodes}) \r\n|distinct Classification ",
             "value": null,
             "typeSettings": {
-              "additionalResourceOptions": [],
+              "additionalResourceOptions": [
+                "value::all"
+              ],
               "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 604800000
             },
             "queryType": 0,
             "resourceType": "microsoft.operationalinsights/workspaces"
@@ -4586,7 +4613,8 @@
               "additionalResourceOptions": [],
               "showDefault": false
             },
-            "jsonData": "[\r\n    { \"value\":\"'Needed'\", \"label\":\"Needed\" },\r\n    { \"value\":\"'Installed'\", \"label\":\"Installed\" },\r\n    { \"value\":\"'Installed' , 'Needed'\", \"label\":\"All\", \"selected\":true }\r\n]"
+            "jsonData": "[\r\n    { \"value\":\"'Needed'\", \"label\":\"Needed\" },\r\n    { \"value\":\"'Installed'\", \"label\":\"Installed\" },\r\n    { \"value\":\"'Installed' , 'Needed'\", \"label\":\"All\", \"selected\":true }\r\n]",
+            "value": "'Needed'"
           }
         ],
         "style": "above",
@@ -4604,7 +4632,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Update\r\n| where  Computer has_any ({Clusternodes}) \r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where  TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, *) by SourceComputerId\r\n| distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
+        "query": "Update\r\n| where  Computer in ({Clusternodes}) \r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where  TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, *) by SourceComputerId\r\n| distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
         "size": 0,
         "title": "Missing Update Summary in the Past 12 hours ",
         "timeContext": {
@@ -4655,7 +4683,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Update\r\n| where  Computer has_any ({Clusternodes}) and  TimeGenerated>ago(14h)\r\n| where OSType!=\"Linux\" and Optional==false\r\n| where Classification == {Classification}\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer,UpdateID ,Classification \r\n//| where UpdateState == {Status} and Approved==True\r\n| where UpdateState in ({Status}) and Approved==True\r\n| summarize Updates_Count=count() by Computer ,Classification",
+        "query": "Update\r\n| where  Computer in ({Clusternodes}) and  TimeGenerated>ago(14h)\r\n| where OSType!=\"Linux\" and Optional==false\r\n| where Classification == {Classification}\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer,UpdateID ,Classification \r\n//| where UpdateState == {Status} and Approved==True\r\n| where UpdateState in ({Status}) and Approved==True\r\n| summarize Updates_Count=count() by Computer ,Classification",
         "size": 0,
         "title": "Missing/Needed Approved Updates in the Past 12 hours ",
         "timeContext": {
@@ -4836,7 +4864,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and UpdateState in ({Status}) and SourceComputerId in ((Heartbeat \r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and  Computer has_any ({Clusternodes})  \r\n| summarize arg_max(TimeGenerated, *) by SourceComputerId\r\n| distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID  \r\n//| where UpdateState=~\"Needed\" and Approved!=false and Classification == {Classification}\r\n| where UpdateState in ({Status}) and Approved!=false and Classification == {Classification}\r\n|sort by Computer \r\n|project  Title,Product, Classification,UpdateState, KBID ,MSRCSeverity,RevisionNumber , PublishedDate ",
+        "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and UpdateState in ({Status}) and SourceComputerId in ((Heartbeat \r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and  Computer in ({Clusternodes})  \r\n| summarize arg_max(TimeGenerated, *) by SourceComputerId\r\n| distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID  \r\n//| where UpdateState=~\"Needed\" and Approved!=false and Classification == {Classification}\r\n| where UpdateState in ({Status}) and Approved!=false and Classification == {Classification}\r\n|sort by Computer \r\n|project  Title,Product, Classification,UpdateState, KBID ,MSRCSeverity,RevisionNumber , PublishedDate ",
         "size": 0,
         "title": "Update Details in the Past 12 hours ",
         "timeContext": {
@@ -4926,7 +4954,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "ConfigurationData\r\n| where Computer has_any ({Clusternodes}) \r\n| where ConfigDataType == \"Software\" and CurrentVersion == \"Installed\" and SoftwareType == \"Update\"  and Publisher == \"Microsoft Corporation\"\r\n| project Computer , SoftwareName\r\n",
+        "query": "ConfigurationData\r\n| where Computer in ({Clusternodes}) \r\n| where ConfigDataType == \"Software\" and CurrentVersion == \"Installed\" and SoftwareType == \"Update\"  and Publisher == \"Microsoft Corporation\"\r\n| project Computer , SoftwareName\r\n",
         "size": 0,
         "title": "Current Installed Updates ",
         "timeContext": {
@@ -4960,7 +4988,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "ConfigurationData\r\n| where  Computer has_any ({Clusternodes}) \r\n| where ConfigDataType == \"WindowsServices\" and (SvcDisplayName contains \"Hyper-V\" or SvcDisplayName contains \"cluster\" or SvcDisplayName contains \"Stack HCI\") and SvcStartupType == \"Auto\"\r\n| extend localTimestamp = TimeGenerated\r\n| extend Status = case(SvcState == \"Stopped\", \"0\",SvcState == \"Running\", \"1\",\"NA\")\r\n| summarize arg_max(localTimestamp, *) by Computer, SvcDisplayName\r\n| order by Status asc\r\n| project Computer ,SvcDisplayName ,Status, TimeGenerated",
+        "query": "ConfigurationData\r\n| where  Computer in ({Clusternodes}) \r\n| where ConfigDataType == \"WindowsServices\" and (SvcDisplayName contains \"Hyper-V\" or SvcDisplayName contains \"cluster\" or SvcDisplayName contains \"Stack HCI\") and SvcStartupType == \"Auto\"\r\n| extend localTimestamp = TimeGenerated\r\n| extend Status = case(SvcState == \"Stopped\", \"0\",SvcState == \"Running\", \"1\",\"NA\")\r\n| summarize arg_max(localTimestamp, *) by Computer, SvcDisplayName\r\n| order by Status asc\r\n| project Computer ,SvcDisplayName ,Status, TimeGenerated",
         "size": 0,
         "timeContext": {
           "durationMs": 86400000
